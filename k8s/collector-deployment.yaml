@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guardian-collector
+  namespace: guardian-system
+  labels:
+    app: guardian-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guardian-collector
+  template:
+    metadata:
+      labels:
+        app: guardian-collector
+    spec:
+      serviceAccountName: guardian-collector-sa
+      containers: 
+      - name: guardian-collector
+        image: saketdocker2005/guardian_repo:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
