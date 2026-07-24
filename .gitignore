@@ -1,0 +1,6 @@
+# Guardian Ignored Files
+
+# Virtual Environment
+venv/
+venv
+env/
