@@ -1,0 +1,57 @@
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages:
+  - "RequestReceived"
+rules:
+  # RBAC objects: full request body - this is the actual permission-grant signal
+  - level: Request
+    resources:
+    - group: "rbac.authorization.k8s.io"
+      resources: ["roles", "clusterroles", "rolebindings", "clusterrolebindings"]
+
+  # ServiceAccounts and token reviews: metadata only, no body needed
+  - level: Metadata
+    resources:
+    - group: ""
+      resources: ["serviceaccounts"]
+    - group: "authentication.k8s.io"
+      resources: ["tokenreviews"]
+
+  # Never log secret/configmap bodies - avoid leaking credentials into the audit log
+  - level: Metadata
+    resources:
+    - group: ""
+      resources: ["secrets", "configmaps"]
+
+  # Cut known noise: kube-proxy watches
+  - level: None
+    users: ["system:kube-proxy"]
+    verbs: ["watch"]
+    resources:
+    - group: ""
+      resources: ["endpoints", "services"]
+
+  # Cut known noise: API discovery / version checks
+  - level: None
+    userGroups: ["system:authenticated"]
+    nonResourceURLs:
+    - "/api*"
+    - "/version"
+
+  # Cut known noise: leader-election churn
+  - level: None
+    resources:
+    - group: ""
+      resources: ["configmaps"]
+      resourceNames: ["controller-leader"]
+
+  # Everything else in core/extensions: request body logged
+  - level: Request
+    resources:
+    - group: ""
+    - group: "extensions"
+
+  # Catch-all: nothing falls through unlogged
+  - level: Metadata
+    omitStages:
+      - "RequestReceived"
