@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audit-collector
+  namespace: guardian-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: audit-collector
+  template:
+    metadata:
+      labels:
+        app: audit-collector
+    spec:
+      serviceAccountName: audit-collector
+      hostPID: true          
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""   
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+      containers:
+      - name: collector
+        image: saketdocker2005/guardian_repo:audit-v1     
+        imagePullPolicy: IfNotPresent
+
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+          
+        volumeMounts:
+        - name: audit-log-dir
+          mountPath: /var/log/kubernetes            
+          readOnly: true
+        - name: k8s-manifests
+          mountPath: /etc/kubernetes/manifests
+          readOnly: true
+        - name: output
+          mountPath: /data                        
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+      volumes:
+      - name: audit-log-dir
+        hostPath:
+          path: /var/log/kubernetes
+          type: DirectoryOrCreate
+      - name: k8s-manifests
+        hostPath:
+          path: /etc/kubernetes/manifests
+          type: Directory
+      - name: output
+        emptyDir: {}
