@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Guardian — Audit Log</title>
+    
+    <!-- External Scripts & Stylesheets -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="tailwind.config.js"></script>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="font-body-md text-body-md min-h-screen flex flex-col h-screen overflow-hidden">
+
+    <!-- TopAppBar Component -->
+    <header class="fixed top-0 w-full z-50 bg-background dark:bg-background text-primary dark:text-primary font-body-md text-body-md border-b border-outline-variant dark:border-outline-variant flex justify-between items-center h-14 px-gutter shrink-0">
+        <div class="flex items-center gap-4">
+            <span class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface">Guardian</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 px-3 py-1 bg-surface-container-highest rounded-full border border-outline-variant">
+                <span class="w-2 h-2 rounded-full bg-secondary pulse-dot"></span>
+                <span class="font-code-sm text-code-sm text-on-surface uppercase tracking-wider">Live</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button aria-label="Notifications" class="p-2 text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-150 rounded-full">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+                </button>
+                <button aria-label="Settings" class="p-2 text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-150 rounded-full">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Stage -->
+    <main class="flex-1 mt-14 overflow-y-auto no-scrollbar w-full max-w-[1200px] mx-auto p-gutter pt-section-gap flex flex-col gap-[1px] bg-[#2D2D2D]" id="log-container">
+        <!-- Logs injected via script.js -->
+    </main>
+
+    <!-- App JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
