@@ -45,6 +45,23 @@ spec:
           limits:
             cpu: 200m
             memory: 256Mi
+
+      - name: audit-api
+        image: saketdocker2005/guardian_repo:audit-api-v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: output
+          mountPath: /data
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+
       volumes:
       - name: audit-log-dir
         hostPath:
