@@ -7,7 +7,7 @@ from datetime import datetime
 import yaml
 
 OUTPUT_FILE = "/data/audit_dump.txt"
-SCAN_INTERVAL_SECONDS = 60
+SCAN_INTERVAL_SECONDS = 5
 STATE_FILE = "/data/.audit_scan_state.json"
 TARGET_NAMESPACE = "default"   # only events in this namespace are written out
 
