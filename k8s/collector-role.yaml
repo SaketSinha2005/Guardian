@@ -8,7 +8,7 @@ rules:
   verbs: ["get", "watch", "list"]
 
 - apiGroups: ["apps"]
-  resources: ["deployments"]
+  resources: ["deployments", "replicasets"]
   verbs: ["get", "watch", "list"]
 
 - apiGroups: ["rbac.authorization.k8s.io"]
