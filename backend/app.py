@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)  
 
 DUMP_FILE = os.environ.get("DUMP_FILE", "/data/audit_dump.txt")
-DEFAULT_LIMIT = 20
+DEFAULT_LIMIT = 50
 SEPARATOR = "=" * 80
 
 
