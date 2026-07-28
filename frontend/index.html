@@ -17,11 +17,10 @@
     <link rel="stylesheet" href="style.css"/>
 </head>
 <body class="font-body-md text-body-md min-h-screen flex flex-col h-screen overflow-hidden">
-
     <!-- TopAppBar Component -->
     <header class="fixed top-0 w-full z-50 bg-background dark:bg-background text-primary dark:text-primary font-body-md text-body-md border-b border-outline-variant dark:border-outline-variant flex justify-between items-center h-14 px-gutter shrink-0">
         <div class="flex items-center gap-4">
-            <span class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface">Guardian</span>
+            <span class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface">KubeAudit.IO</span>
         </div>
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2 px-3 py-1 bg-surface-container-highest rounded-full border border-outline-variant">
@@ -39,10 +38,53 @@
         </div>
     </header>
 
-    <!-- Main Content Stage -->
-    <main class="flex-1 mt-14 overflow-y-auto no-scrollbar w-full max-w-[1200px] mx-auto p-gutter pt-section-gap flex flex-col gap-[1px] bg-[#2D2D2D]" id="log-container">
-        <!-- Logs injected via script.js -->
-    </main>
+    <!-- Main Container -->
+    <div class="flex flex-1 mt-14 overflow-hidden w-full">
+        <!-- Sidebar -->
+        <aside class="w-[240px] bg-background border-r border-outline-variant flex flex-col py-4 shrink-0 overflow-y-auto no-scrollbar">
+            <nav class="flex flex-col gap-1 px-2">
+                <button class="nav-item active flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface hover:bg-surface-container-highest transition-colors text-left" onclick="switchView('audit-view', this)">
+                    <span class="material-symbols-outlined text-[20px]">history</span>
+                    <span class="font-body-md">Audit Log</span>
+                </button>
+                <button class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface hover:bg-surface-container-highest transition-colors text-left border-l-3 border-transparent" onclick="switchView('pods-view', this)">
+                    <span class="material-symbols-outlined text-[20px]">deployed_code</span>
+                    <span class="font-body-md">Pods</span>
+                </button>
+            </nav>
+        </aside>
+        
+        <!-- Main Content Stage -->
+        <main class="flex-1 overflow-y-auto no-scrollbar w-full bg-[#2D2D2D] relative" id="main-content">
+            <!-- Audit Log View -->
+            <div class="w-full max-w-[1200px] mx-auto p-gutter pt-section-gap flex flex-col gap-[1px]" id="audit-view">
+                <div class="flex flex-col gap-[1px]" id="log-container">
+                    <!-- Logs injected via script.js -->
+                </div>
+            </div>
+            
+            <!-- Pods View -->
+            <div class="hidden w-full max-w-[1200px] mx-auto p-gutter pt-section-gap flex-col gap-[1px]" id="pods-view">
+                <!-- Pods List Container -->
+                <div class="flex flex-col gap-[1px]" id="pods-container">
+                    <!-- Pod rows injected by JS -->
+                </div>
+            </div>
+            
+            <!-- Pod Detail Slide-in Panel -->
+            <div class="absolute top-0 right-0 bottom-0 w-[500px] bg-surface-container-low border-l border-outline-variant shadow-2xl flex flex-col z-40" id="pod-detail-panel">
+                <div class="flex justify-between items-center p-4 border-b border-outline-variant">
+                    <h2 class="font-headline-md text-on-surface" id="panel-pod-name">Pod Details</h2>
+                    <button class="p-1 text-on-surface-variant hover:bg-surface-container-highest rounded-full transition-colors" onclick="closePodPanel()">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 no-scrollbar">
+                    <pre class="font-code-sm text-primary overflow-x-auto m-0"><code id="panel-pod-yaml"></code></pre>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <!-- App JavaScript -->
     <script src="script.js"></script>

@@ -45,3 +45,18 @@ body {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
+
+/* Sidebar active state */
+.nav-item.active {
+    background-color: #292a2b; /* surface-container-high */
+    border-left: 3px solid #4ae176; /* secondary */
+}
+
+/* Pod slide-in panel */
+#pod-detail-panel {
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+}
+#pod-detail-panel.open {
+    transform: translateX(0);
+}
