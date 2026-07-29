@@ -20,104 +20,36 @@ const API_BASE_URL = 'http://192.168.49.2:30080';
 const POLL_INTERVAL_MS = 30000;
 
 const logContainer = document.getElementById('log-container');
-const expandedAuditIds = new Set();
-let lastRenderedLogs = [];
 
-function toggleExpand(auditId) {
-    if (expandedAuditIds.has(auditId)) {
-        expandedAuditIds.delete(auditId);
-    } else {
-        expandedAuditIds.add(auditId);
-    }
-    renderLogs(lastRenderedLogs);
+function escapeHtmlJs(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
-function classifyVerb(verb) {
-    if (['create', 'update', 'patch'].includes(verb)) return 'action-pill-create';
-    if (verb === 'delete') return 'action-pill-delete';
-    return 'action-pill-get';
-}
-
-function formatResource(objectRef) {
-    if (!objectRef) return 'unknown';
-    const kind = objectRef.resource || 'resource';
-    const singular = kind.endsWith('s') ? kind.slice(0, -1) : kind;
-    const label = singular.charAt(0).toUpperCase() + singular.slice(1);
-    return objectRef.name ? `${label}/${objectRef.name}` : label;
-}
-
-function formatTimestamp(event) {
-    const raw = event.stageTimestamp || event.requestReceivedTimestamp || '';
-    if (!raw) return '';
-    return raw.replace('T', ' ').substring(0, 19);
-}
-
-function toDisplayLog(event) {
-    const verb = event.verb || 'unknown';
-    const user = (event.user && event.user.username) || 'unknown-user';
-    const decision = (event.annotations && event.annotations['authorization.k8s.io/decision']) || 'unknown';
-
-    return {
-        auditId: event.auditID || JSON.stringify(event),
-        timestamp: formatTimestamp(event),
-        verb,
-        pillClass: classifyVerb(verb),
-        user,
-        resource: formatResource(event.objectRef),
-        decision,
-        rawJson: JSON.stringify(event, null, 2),
-    };
-}
-
-function createLogCardHTML(log) {
-    const decisionIcon = log.decision === 'allow' ? 'check_circle' : (log.decision === 'deny' ? 'cancel' : 'help');
-    const decisionClass = log.decision === 'allow' ? 'decision-allow' : (log.decision === 'deny' ? 'decision-deny' : '');
-    const isExpanded = expandedAuditIds.has(log.auditId);
-    const expandedClass = isExpanded ? 'expanded' : '';
-    const safeId = log.auditId.replace(/'/g, "\\'");
+function createRawJsonCardHTML(event) {
+    const auditId = event.auditID || '(no auditID)';
+    const scannedAt = event._scanned_at || '';
+    const rawJson = escapeHtmlJs(JSON.stringify(event, null, 2));
 
     return `
-        <div class="log-card w-full cursor-pointer flex flex-col group ${expandedClass}" onclick="toggleExpand('${safeId}')">
-            <div class="flex items-center justify-between p-[12px] gap-4">
-                <div class="flex items-center gap-4 flex-1 min-w-0">
-                    <span class="font-code-sm text-code-sm text-on-surface-variant whitespace-nowrap shrink-0">${log.timestamp}</span>
-
-                    <span class="font-code-sm text-code-sm px-2 py-0.5 rounded-sm uppercase tracking-wider ${log.pillClass} shrink-0">
-                        ${log.verb}
-                    </span>
-
-                    <span class="font-code-sm text-code-sm text-primary truncate max-w-[200px]" title="${log.user}">
-                        ${log.user}
-                    </span>
-
-                    <span class="font-body-sm text-body-sm text-on-surface truncate flex-1">
-                        ${log.resource}
-                    </span>
-                </div>
-
-                <div class="flex items-center gap-3 shrink-0">
-                    <div class="flex items-center gap-1 ${decisionClass}">
-                        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">${decisionIcon}</span>
-                        <span class="font-label-caps text-label-caps uppercase">${log.decision}</span>
-                    </div>
-                    <span class="material-symbols-outlined text-outline-variant text-[20px] transition-transform duration-200 group-[.expanded]:rotate-180">expand_more</span>
-                </div>
+        <div class="log-card w-full flex flex-col">
+            <div class="flex items-center justify-between px-[12px] pt-[10px] pb-1">
+                <span class="font-code-sm text-code-sm text-primary truncate">${auditId}</span>
+                <span class="font-code-sm text-code-sm text-on-surface-variant whitespace-nowrap shrink-0">scanned: ${scannedAt}</span>
             </div>
-
-            <div class="${isExpanded ? 'block' : 'hidden'} border-t border-outline-variant p-[12px] bg-surface-container-lowest">
-                <pre class="font-code-sm text-code-sm text-on-surface-variant overflow-x-auto m-0"><code>${log.rawJson}</code></pre>
-            </div>
+            <pre class="font-code-sm text-code-sm text-on-surface-variant overflow-x-auto m-0 px-[12px] pb-[12px]"><code>${rawJson}</code></pre>
         </div>
     `;
 }
 
-function renderLogs(logs) {
-    lastRenderedLogs = logs;
-    if (!logs.length) {
+function renderLogs(events) {
+    if (!events.length) {
         logContainer.innerHTML = `<div class="p-6 text-on-surface-variant font-body-md text-body-md">No events yet.</div>`;
         return;
     }
-    logContainer.innerHTML = logs.map(createLogCardHTML).join('');
+    logContainer.innerHTML = events.map(createRawJsonCardHTML).join('');
 }
 
 async function fetchAndRender() {
@@ -125,8 +57,7 @@ async function fetchAndRender() {
         const res = await fetch(`${API_BASE_URL}/api/logs`);
         if (!res.ok) throw new Error(`Backend returned ${res.status}`);
         const data = await res.json();
-        const logs = (data.events || []).map(toDisplayLog);
-        renderLogs(logs);
+        renderLogs(data.events || []);
     } catch (err) {
         console.error('Failed to fetch audit logs:', err);
         logContainer.innerHTML = `<div class="p-6 text-error font-body-md text-body-md">Could not reach backend at ${API_BASE_URL}. Is it running and reachable?</div>`;
