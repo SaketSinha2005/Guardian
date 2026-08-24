@@ -9,7 +9,7 @@ import yaml
 OUTPUT_FILE = "/data/audit_dump.txt"
 SCAN_INTERVAL_SECONDS = 5
 STATE_FILE = "/data/.audit_scan_state.json"
-TARGET_NAMESPACE = "default"   # only events in this namespace are written out
+TARGET_NAMESPACE = "default"   
 
 
 def find_audit_log():
