@@ -22,7 +22,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: collector
-        image: saketdocker2005/guardian_repo:audit-v4
+        image: saketdocker2005/guardian_repo:audit-v3
         imagePullPolicy: IfNotPresent
 
         env:
