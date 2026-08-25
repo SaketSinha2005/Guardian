@@ -47,13 +47,45 @@ spec:
             memory: 256Mi
 
       - name: audit-api
-        image: saketdocker2005/guardian_repo:audit-api-v1
+        image: saketdocker2005/guardian_repo:audit-api-v3
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
         volumeMounts:
         - name: output
           mountPath: /data
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+
+      - name: redis-writer
+        image: saketdocker2005/guardian_repo:redis-writer-v1
+        env:
+        - name: DUMP_FILE
+          value: "/data/audit_dump.txt"
+        - name: REDIS_HOST
+          value: "localhost"     
+        - name: REDIS_PORT
+          value: "6379"
+        volumeMounts:
+        - name: output
+          mountPath: /data
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+
+      - name: redis
+        image: redis:7-alpine
+        ports:
+          - containerPort: 6379
         resources:
           requests:
             cpu: 50m
